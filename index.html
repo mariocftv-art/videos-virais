@@ -561,9 +561,14 @@ footer b{display:block;letter-spacing:.34em;text-transform:uppercase;color:var(-
   var v = document.getElementById('vid');
   function sumir(){ var b = document.getElementById('vbox'); if (b) b.style.display = 'none'; }
   if (v) {
-    v.addEventListener('error', sumir, true);
+    var fontes = v.querySelectorAll('source'), falhas = 0;
+    fontes.forEach(function(f){ f.addEventListener('error', function(){
+      falhas++; if (falhas >= fontes.length && !v.dataset.ok) sumir();
+    }); });
     v.addEventListener('loadedmetadata', function(){ v.dataset.ok = '1'; });
-    setTimeout(function(){ if (!v.dataset.ok) sumir(); }, 3500);
+    v.addEventListener('loadstart', function(){ v.dataset.tentou = '1'; });
+    /* espera bem mais: video grande no celular demora para responder */
+    setTimeout(function(){ if (!v.dataset.ok && !v.dataset.tentou) sumir(); }, 15000);
   }
 
   var lb = document.getElementById('lbx'), im = document.getElementById('lbximg');
